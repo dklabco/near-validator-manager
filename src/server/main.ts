@@ -2,6 +2,7 @@ import { Request, Response } from "restify";
 import { outputView, submitEntry, getEntries } from "./helper";
 import somnus, { IRouteConfig } from "somnus";
 import { join } from "path";
+import { poolIdGetAccountsJsonRenderer, poolIdGetAccountsPageRenderer } from "./request-handlers/poolId-get-accounts";
 
 async function main(): Promise<void> {
 
@@ -12,6 +13,10 @@ async function main(): Promise<void> {
     let routeConfig: IRouteConfig = {
 
         "get /": (req: Request, res: Response) => outputView(req, res, "./view-templates/index.html"),
+
+        // @TODO support pagination
+        "get /validator/:poolId/get_accounts/view": poolIdGetAccountsPageRenderer,
+        "get /validator/:poolId/get_accounts": poolIdGetAccountsJsonRenderer,
 
         "post /entry": submitEntry,
         "get /entries": getEntries,
