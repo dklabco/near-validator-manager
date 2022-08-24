@@ -1,7 +1,8 @@
 import { Request, Response } from "restify";
-import { outputView, submitEntry, getEntries } from "./helper";
+import { outputView } from "./helper";
 import somnus, { IRouteConfig } from "somnus";
 import { join } from "path";
+import { poolIdGetAccountsJsonRenderer, poolIdGetAccountsPageRenderer } from "./request-handlers/poolId-get-accounts";
 
 async function main(): Promise<void> {
 
@@ -11,10 +12,15 @@ async function main(): Promise<void> {
 
     let routeConfig: IRouteConfig = {
 
+        // @TODO SSR the component
         "get /": (req: Request, res: Response) => outputView(req, res, "./view-templates/index.html"),
 
-        "post /entry": submitEntry,
-        "get /entries": getEntries,
+        // @TODO support pagination
+        "get /validator/:poolId/get_accounts/view": poolIdGetAccountsPageRenderer,
+        "get /validator/:poolId/get_accounts": poolIdGetAccountsJsonRenderer,
+
+        // @TODO implement this
+        "put /config": (req: Request, res: Response) => res.send(200, { message: "config updated" }),
 
         // in real production, these should be intercepted & handled by a reverse proxy / CDN instead
         "get /js/*": somnus.restify.plugins.serveStatic({ directory: "../public" }),

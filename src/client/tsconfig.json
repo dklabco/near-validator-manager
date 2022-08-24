@@ -3,7 +3,8 @@
         "outDir": "../../build/public/",
         "baseUrl": ".",
         "paths": {
-          "shared/*": ["../shared/*"]
+          "shared/*": ["../shared/*"],
+          "client/*": ["../client/*"]
         },
         "sourceMap": true,
         "esModuleInterop": true,

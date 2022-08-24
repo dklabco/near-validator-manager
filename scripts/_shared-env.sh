@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # you may define env vars that are then passed into client & server apps (by webpack) here
-export APP_NAME="A db-agnostic, React-based web application starter boilerplate"
+export APP_NAME="Manager UI for a validator node on the NEAR Blockchain"
 
 LAST_COMMIT=$(git log -1 --pretty=format:"%h" 2>>_shared-env.err.log)
 GIT_DIRTY_STATE=$(git diff --quiet 2>>_shared-env.err.log || echo "*")

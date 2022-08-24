@@ -10,26 +10,22 @@ import Input from "@mui/material/Input";
 import { Alert, AlertTitle } from "@mui/material";
 import "./App.scss";
 
-import { isValidEmail } from "shared/utils";
-import { submitEntry } from "./services";
-import { IRespPayload } from "shared/types";
+import { updateNetworkId } from "./services";
+import { IRespPayload, NEAR_NETWORK_ID } from "shared/types";
 
 const App: React.FunctionComponent = () => {
 
-  const [firstName, setFirstName] = useState<string>("");
-  const [lastName, setLastName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  // const [eventDate, setEventDate] = useState<Date>(new Date());
+  const [networkId, setNetworkId] = useState<string>("shardnet");
+  const [poolId, setPoolId] = useState<string>("xx.factory.shardnet.near");
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [feedback, setFeedback] = useState<string>("");
 
   function validateAllFields(): true | string[] {
       const validationIssues: string[] = [];
-      if (firstName === "") validationIssues.push("missing first name");
-      if (lastName === "") validationIssues.push("missing last name");
-      if (!isValidEmail(email)) validationIssues.push("invalid email address");
-      // if (eventDate == null) validationIssues.push("missing event date");
+      if (networkId === "") validationIssues.push("missing networkId");
+      if (poolId === "") validationIssues.push("missing poolId");
+      // if (!isValidEmail(email)) validationIssues.push("invalid email address");
       return validationIssues.length ? validationIssues : true;
   }
 
@@ -52,9 +48,8 @@ const App: React.FunctionComponent = () => {
 
           setIsSubmitting(true);
           try {
-
-              // send all fields to backend
-              const resp: IRespPayload = await submitEntry({ firstName, lastName, email });
+              const resp: IRespPayload = await updateNetworkId(networkId as NEAR_NETWORK_ID);
+              // @TODO handle poolId as well
               setFeedback(resp.message);
               
           } catch (e) {
@@ -80,52 +75,42 @@ const App: React.FunctionComponent = () => {
     <DialogTitle id="dialog-title">{process.env.APP_NAME}</DialogTitle>
     <DialogContent>
       <h5><DialogContentText>
-        <small>{"all fields are required"}</small>
+        <small>{"configuration"}</small>
       </DialogContentText></h5>
         <div style={{ display: "flex", flexDirection: "row" }}>
           <div style={{ flexGrow: 1 }}>
             <Input
-              name="firstName"
+              disabled // @TODO enable once dynamic networkId is supported
+              title="Only 'shardnet' is supported for now"
+              name="networkId"
               type="text"
               inputMode="text"
-              placeholder={"first name"}
-              value={firstName}
-              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => setFirstName(evt.target.value)}
-              inputProps={{ "aria-label": "first name" }}
+              placeholder={"shardnet"}
+              value={networkId}
+              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => setNetworkId(evt.target.value)}
+              inputProps={{ "aria-label": "networkId" }}
               fullWidth
             />
           </div>
           <div style={{ minWidth: 10, flexGrow: 0 }} />
-          <div style={{ flexGrow: 1 }}>
-            <Input
-              name="lastName"
-              type="text"
-              inputMode="text"
-              placeholder={"last name"}
-              value={lastName}
-              onChange={(evt: React.ChangeEvent<HTMLInputElement>) => setLastName(evt.target.value)}
-              inputProps={{ "aria-label": "last name" }}
-              fullWidth
-            />
-          </div>
         </div>
         <div style={{ marginTop: 10, marginBottom: 10 }}>
           <Input
-            name="email"
-            type="email"
-            inputMode="email"
-            placeholder={"email"}
-            value={email}
-            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => setEmail(evt.target.value)}
-            inputProps={{ "aria-label": "email" }}
+            name="poolId"
+            type="text"
+            inputMode="text"
+            placeholder={"xx.factory.shardnet.near"}
+            value={poolId}
+            onChange={(evt: React.ChangeEvent<HTMLInputElement>) => setPoolId(evt.target.value)}
+            inputProps={{ "aria-label": "poolId" }}
             fullWidth
           />
         </div>
       {feedback !== "" && <Alert severity="info" className="feedback-info">
         <span>{feedback}</span>
         {" "}
-        (<a href="/entries" target="_blank" style={{ textDecoration: "underline", color: "inherit" }}>
-            {"view all entries as JSON"}
+        (<a href={`/validator/${poolId}/get_accounts/view`} target="_blank" style={{ textDecoration: "underline", color: "inherit" }}>
+            {"view 'get_accounts' result for validator"}
         </a>)
       </Alert>}
       {errors.length > 0 && <Alert severity="error" className="feedback-error">
