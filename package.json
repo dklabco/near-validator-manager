@@ -18,6 +18,7 @@
     "@types/restify": "^8.5.4",
     "jest": "^28.1.2",
     "jest-environment-jsdom": "^28.1.2",
+    "identity-obj-proxy": "^3.0.0",
     "nodemon": "^2.0.18"
   },
   "dependencies": {
@@ -27,7 +28,6 @@
     "babel-loader": "^8.2.5",
     "css-loader": "^6.7.1",
     "html-webpack-plugin": "^5.5.0",
-    "identity-obj-proxy": "^3.0.0",
     "sass": "^1.53.0",
     "sass-loader": "^13.0.2",
     "source-map-loader": "^4.0.0",
