@@ -1,7 +1,7 @@
 {
   "name": "@dklab/near-validator-manager",
   "version": "0.1.0",
-  "description": "UI to manage a validator node for the NEAR Blockchain",
+  "description": "Manager UI for a validator node on the NEAR Blockchain",
   "scripts": {
     "build-prod": "scripts/build-prod.sh",
     "build": "npm run build-prod",
