@@ -26,13 +26,15 @@ async function initWebpackDevMiddleware(app: restify.Server) {
     })
   );
 
-  // requests for `.js`, `.js.map` and `/webpack_hmr` shall pass thru this
+  // requests for everythig, including `.js`, `.js.map` and `/webpack_hmr` shall pass thru this
   app.pre(
     (req, res, next) => {
       const thePath = req.getPath();
-      console.log("somnus: custom whm handling", thePath);
+      const theQuery = req.getQuery();
+      const theUrl = `${thePath}?${theQuery}`
+      console.log("somnus: custom whm handling", theUrl);
       // fix a webpack-hot-middleware - restify incompatibility
-      req.url = thePath;
+      req.url = theUrl;
       return next();
     },
     require("webpack-hot-middleware")(compiler, {

@@ -5,6 +5,12 @@ export interface IRespPayload {
 
 export type NEAR_NETWORK_ID = "mainnet" | "testnet" | "shardnet"
 
+export type StackingPoolGetAccountsArgs = {
+  poolId: string
+  from?: number
+  limit?: number
+}
+
 export interface IStackingPoolContractGetAccountsRespAccount {
   account_id: string;
   unstaked_balance: string;

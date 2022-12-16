@@ -8,7 +8,11 @@ async function main(): Promise<void> {
 
     process.chdir(__dirname);
 
+    // somnus.server.pre(somnus.restify.pre.sanitizePath());
     somnus.server.use(somnus.restify.plugins.bodyParser());
+    somnus.server.use(somnus.restify.plugins.queryParser());
+
+    somnus.server.get('/test', (req: Request, res: Response) => res.send(200, { query: req.query.foo, what: true }));
 
     let routeConfig: IRouteConfig = {
 

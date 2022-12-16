@@ -1,8 +1,10 @@
 import React from "react";
+import { Buffer } from 'node:buffer';
 import { Request, Response } from "restify";
 import { providers } from "near-api-js";
 import { renderToPipeableStream } from "react-dom/server";
 import { PoolGetAccounts } from "client/PoolGetAccounts";
+import { StackingPoolGetAccountsArgs } from "shared/types";
 
 const provider = new providers.JsonRpcProvider(
   "https://rpc.shardnet.near.org"
@@ -12,19 +14,21 @@ const arrBytesToString = (arr: ArrayLike<number>): string => {
   return new TextDecoder().decode(Uint8Array.from(arr))
 }
 
-const poolIdGetAccountsQuery = async (poolId: string): Promise<any> => {
+const poolIdGetAccountsQuery = async ({ poolId, from = 0, limit = 10 }: StackingPoolGetAccountsArgs): Promise<any> => {
   let rawResult: any, result: any, error: any, status: number = 500
   if (!poolId) {
     status = 400
     error = 'poolId not provided'
   }
+  // echo '{"from_index": 0, "limit": 10}' | base64
+  console.log(`{"from_index": ${from}, "limit": ${limit}}`)
+  const args: string = Buffer.from(`{"from_index": ${from}, "limit": ${limit}}`).toString("base64");
   try {
     rawResult = await provider.query({
       request_type: "call_function",
       account_id: poolId,
       method_name: "get_accounts",
-      // @TODO enable pagination
-      args_base64: "eyJmcm9tX2luZGV4IjogMCwgImxpbWl0IjogMTB9Cg==", // echo '{"from_index": 0, "limit": 10}' | base64
+      args_base64: args,
       finality: "optimistic",
     })
     result = JSON.parse(Buffer.from(rawResult.result).toString());
@@ -36,12 +40,22 @@ const poolIdGetAccountsQuery = async (poolId: string): Promise<any> => {
 }
 
 export const poolIdGetAccountsJsonRenderer = async (req: Request, res: Response): Promise<any> => {
-  const { rawResult, result, status, error } = await poolIdGetAccountsQuery(req.params?.poolId)
+  const { rawResult, result, status, error } = await poolIdGetAccountsQuery({
+    poolId: req.params?.poolId,
+    from: req.params?.from,
+    limit: req.params?.limit
+  })
   res.send(status, { rawResult, result, error })
 }
 
 export const poolIdGetAccountsPageRenderer = async (req: Request, res: Response): Promise<void> => {
-  const { result, error, status } = await poolIdGetAccountsQuery(req.params?.poolId);
+  console.log(req.url, req.query, req.params)
+  const { result, error, status } = await poolIdGetAccountsQuery({
+    poolId: req.params?.poolId,
+    from: req.params?.from,
+    limit: req.params?.limit
+  });
+  // console.log({ result, error, status })
   let didError = false;
   const stream = renderToPipeableStream(
     <PoolGetAccounts accounts={result} />, {
